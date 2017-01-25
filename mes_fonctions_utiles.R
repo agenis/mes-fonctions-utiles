@@ -1,52 +1,26 @@
-##########################################################################                                       
-#  __  __     ____       _____       __         ______      ______       #
-# /\ \/\ \   /\  _`\    /\  __`\    /\ \       /\__  _\    /\  _  \      #
-# \ \ \ \ \  \ \ \L\_\  \ \ \/\ \   \ \ \      \/_/\ \/    \ \ \L\ \     #
-#  \ \ \ \ \  \ \  _\L   \ \ \ \ \   \ \ \  __    \ \ \     \ \  __ \    #
-#   \ \ \_/ \  \ \ \L\ \  \ \ \_\ \   \ \ \L\ \    \_\ \__   \ \ \/\ \   #
-#    \ `\___/   \ \____/   \ \_____\   \ \____/    /\_____\   \ \_\ \_\  #
-#     `\/__/     \/___/     \/_____/    \/___/     \/_____/    \/_/\/_/  #
-#   ___  _  _  _ _  _  ___   _   _  _  _  _  ___  _   _  ___  _  _  ___  #
-#  | __|| \| || | || || o \ / \ | \| || \| || __|| \_/ || __|| \| ||_ _| #
-#  | _| | \\ || V || ||   /( o )| \\ || \\ || _| | \_/ || _| | \\ | | |  #
-#  |___||_|\_| \_/ |_||_|\\ \_/ |_|\_||_|\_||___||_| |_||___||_|\_| |_|  #
-#                                                                        #
-#  ____/\\\\\\\\\________________/\\\_________/\\\\\\\\\\\\____          #
-#   __/\\\///////\\\___________/\\\//\\\______\/\\\////////\\\__         #
-#    _\/\\\_____\/\\\__________/\\\_/\\\_______\/\\\______\//\\\_        #
-#     _\/\\\\\\\\\\\/__________\//\\\\//________\/\\\_______\/\\\_       #
-#      _\/\\\//////\\\_________/\\\///\\\________\/\\\_______\/\\\_      #
-#       _\/\\\____\//\\\______/\\\/__\///\\\/\\\__\/\\\_______\/\\\_     #
-#        _\/\\\_____\//\\\____/\\\______\//\\\//___\/\\\_______/\\\__    #
-#         _\/\\\______\//\\\__\//\\\\\\\\\\\//\\\___\/\\\\\\\\\\\\/___   #
-#          _\///________\///____\///////////_\///____\////////////_____  #
-#                                                                        #
-##########################################################################
-
 
 ##########################################################################
 #                F O N C T I O N S    U T I L E S
 #                                        by: marc.agenis-nevers@veolia.com
 ##########################################################################
-# derni?re mise ? jour: 30 mars 2015
+# derniere mise a jour: 25 janvier 2017
 
-# Copier cette ligne dans un autre script:
-# source(file="C:/Users/Marc.AGENIS-NEVERS/Desktop/stats/R-symbols & scripts/scripts finalis?s/mes_fonctions_utiles.R")
+# Execution: tout selectionner puis "Run". Ou faire "Source".
 
-liste <- c("wd", "import", "wt", "wtn", "save.xls", "rmat", "shift", "Show", "rhead", "seqrange",
-           "pc1", "pc2", "ecart", "is.empty", "CV", "+15 fonctions de base avec na.rm=T", 
-           "minmax", "sumstats", "almost.equal", "removeZeros", "removeNAs", "CreateRunGroups", "q_lm", "ggpie", ".ggpie", "ggACF", "TS4X4", "ggNA",
-           "ggNAadd", "colstr", "where.outliers", "HistoDens", "ggPCA", "ggCA", "lmplots", "lml", "lmlX", "PredError", "CreateCalendarVariables")
+liste <- c("detach.", ".ls.objects", "r", "wd", "import", "wt", "wtn", "rhead", "seqrange", "shift", "rmat", "Show", 
+           "pc1", "pc2", "ecart", "is.empty", "fitex", "CV", "+15 fonctions de base avec na.rm=T", 
+           "minmax", "sumstats", "almost.equal", "MonthNames", "removeZeros", "removeNAs", "CreateRunGroups", "sign3", "Nullratio", "q_lm", 
+           "gg_color_hue", "ggpie", ".ggpie", "ggACF", "TS4X4", "regsubsett4X4", "ggNA", "ggNAadd", 
+           "colstr", "where.outliers", "HistoDens", "ggPCA", "ggCA", "lmplots", "lml", "lmlX", "PredError", "CreateCalendarVariables")
 
-# Packages a charger
-library(ggplot2)
-library(gridExtra)
-library(FactoMineR)
-library(ellipse)
-require(RColorBrewer)
-require(reshape2)
 
-# improved list of objects
+# detacher package (entre guillemets) sans renvoyer erreur en cas d'absence du package
+detach. = function(pkg) {
+  mypos <- match(paste("package", pkg, sep = ":"), search())
+  if (!is.na(mypos)) detach(pos=mypos)
+}
+
+# Liste tous les objets disponibles dans l'environnement
 .ls.objects <- function (pos = 1, pattern, order.by,
                          decreasing=FALSE, head=FALSE, n=5) {
   napply <- function(names, fn) sapply(names, function(x)
@@ -71,18 +45,16 @@ require(reshape2)
   out
 }
 
-# shorthand
-lsos <- function(..., n=10) {
-  .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
-}
-
-# fonction identique à rnorm mais en moins de charactères...
+# fonction identique a rnorm mais plus rapide a ecrire et avec des arguments par defaut
 r = function(n=1, ...) rnorm(n, ...)
 
-# Fonction pour voir si tout les ?l?ments d'un vecteur sont differents
-all.diff = function(num) NROW(unique(num))==NROW(num)
+# Fonction pour voir si tout les elements d'un vecteur sont differents
+all.diff = function(num) {
+  if (length(num)<=1) message("attention un seul element dans le vecteur")
+  NROW(unique(num))==NROW(num)
+}
 
-# Fontion pour ouvrir le working directory (ou un autre)
+# Fontion pour ouvrir dans une fenetre le repertoire de travail
 wd <- function(dir = getwd()){
   if (.Platform['OS.type'] == "windows"){
     shell.exec(dir)
@@ -91,7 +63,7 @@ wd <- function(dir = getwd()){
   }
 }
 
-# Fonction pour importer un csv classique point virgule, d?cimale fr.. Peut importer automatiquement du bureau.
+# Fonction pour importer un csv classique point virgule, decimale (systeme francais). Peut importer automatiquement du bureau.
 import = function(file, desktop=FALSE, ...) { # entre guillemets
   path <- file
   if (desktop) {
@@ -105,21 +77,22 @@ wt = function(tableau, ...) {
   write.table(tableau, file="output.csv", dec=",", sep=";", col.names=NA, ...)
 }
 
-# Fonction pour exporter au format excel un 'N'ouveau data.frame (pour ?viter l'overwriting
-# et l'erreur s'il est d?j? ouvert)
+# Fonction pour exporter au format excel un 'N'ouveau data.frame (pour eviter l'overwriting
+# d'un precedent ou l'erreur s'il est deja ouvert par exemple)
 wtn = function(tableau) {
   filename = paste0("output", round(runif(1)*1E6), ".csv")
   write.table(tableau, file=filename, dec=",", sep=";", col.names=NA)
 }
 
-# Fonction analogue de "head" ou "glimpse", avec lignes al?atoires (et seed si besoin)
+# Fonction analogue de "head" ou "glimpse", avec lignes aleatoires (et seed si besoin)
+# mais marche que sur les data.frames
 rhead = function(data, rows=7, seed=NULL) {
   if (!is.null(seed)) set.seed(seed)
   data[base::sample(NROW(data), rows), ]
 }
 
-# fonction qui cr?e une s?quence entre les bornes max d'un vecteur
-# cr?e un nombre de valeurs d?sir? (d?faut 100) ou par pas de 1 (sp?cifier nb=1)
+# fonction qui cree une sequence entre les bornes max d'un vecteur
+# cree un nombre de valeurs desire (defaut 100) ou par pas de 1 (specifier nb=1)
 seqrange=function(x, nb=100, integers=FALSE) {
   if (!integers) {
   out <- seq(from=min(x), to=max(x), length.out=ifelse(nb==1, diff(range(x))+1, nb))
@@ -129,8 +102,8 @@ seqrange=function(x, nb=100, integers=FALSE) {
   return(out)
 }
 
-# fonction qui cr?? un vectuer retard? (ou diff?renci?) dans un sens ou dans l'autre
-# fill argument pour remplir les trous cr??s avec la premi?re ou derni?re valeur
+# fonction qui cree un vecteur retarde (ou differencie) dans un sens ou dans l'autre
+# fill argument pour remplir les trous crees avec la premiere ou derniere valeur
 shift = function(x, lag, fill=FALSE) {
   require(dplyr)
   switch(sign(lag)/2+1.5, 
@@ -140,7 +113,8 @@ shift = function(x, lag, fill=FALSE) {
 }
 
 
-# cr?e une matrice al?atoire carr?e de dimension choisie, loi normale. df pour cr?er un data.frame
+# cree une matrice aleatoire carree de dimension choisie, peuplee par une distribution gaussienne. 
+# Option df=TRUE pour creer un data.frame
 rmat = function(cote=10, df=FALSE, seed=NULL) {
   if (!is.null(seed)) {set.seed(seed)}
   temp <- matrix(rnorm(cote^2), ncol=cote)
@@ -150,21 +124,23 @@ rmat = function(cote=10, df=FALSE, seed=NULL) {
   return(temp)
 }
 
-# Fonction pour afficher une matrice sous forme d'image
+# Fonction pour afficher une matrice sous forme d'image, **dans le bon sens!**
 Show = function(df, ...) {image(t(df[nrow(df):1,]), ...)}
 
-# Fonction pour multiplier par 100 et garder une d?cimale
+# Fonction pour multiplier par 100 et garder une decimale (pour les resultats en pourcentage dnas les rapports)
 pc1 = function(vector) {
   return(round(vector*100, 1))
 }
 
-# Fonction pour multiplier par 100 et garder deux d?cimale
+# Fonction pour multiplier par 100 et garder DEUX decimales (pour les resultats en pourcentage dnas les rapports)
 pc2 = function(vector) {
   return(round(vector*100, 2))
 }
 
-# Fonction pour calculer l'ecart entre deux nombres ou vecteurs, le premier ?tant la r?f?rence
-# l'argument "pc" renvoie le r?sultat en pourcentage
+# Fonction pour calculer l'ecart entre deux nombres ou vecteurs, le premier etant la reference
+# l'argument "pc" renvoie le resultat en pourcentage
+# cette fonction peut prendre un vecteur de deux elements en input et renvoie l'ecart
+# entre le premier et le second
 ecart = function(x1, x2=NULL, pc=TRUE){
   if (is.null(x2)){
     message("first two elements used")
@@ -172,7 +148,7 @@ ecart = function(x1, x2=NULL, pc=TRUE){
   } else {
     res=(x2 - x1)/x1*100^pc 
   }
-  return( res ) # pc permet de choisir r?sultat en pourcentage ou non
+  return(res)
 }
 
 # Fonction pour tester si un objet est vide (vecteur ou data.frame)
@@ -181,7 +157,8 @@ is.empty = function (input) {
   (is.null(df) || nrow(df) == 0 || ncol(df) == 0 || NROW(df) == 0)
 }
 
-# fonction pour generer rapidement un modele lineaire simple, ou bivarié
+# fonction pour generer rapidement un modele lineaire simple, ou bivarie
+# il apparait dans l'environnement sous le nom "fit."
 fitex = function(covariates=1){
   if (covariates<=1) {fit. <- lm(mpg~hp, mtcars)} else {fit. <- lm(mpg~hp+wt, mtcars)}
   fit.<<- fit.
@@ -207,7 +184,7 @@ pmin.   = function(x) pmin(x, na.rm=T)
 pmax.   = function(x) pmax(x, na.rm=T)
 weighted.mean.= function(x) weighted.mean(x, na.rm=T)
 
-# fonction pour normaliser min/max (R->[0;1]), attention toutes colonnes doivent etre num?riques
+# fonction pour normaliser min/max un data.frame (R->[0;1]), attention toutes colonnes doivent etre numeriques
 minmax <- function(data, ...) {
   .minmax = function(x) (x-min(x, ...))/(max(x, ...)-min(x, ...))
   # find constant columns, replaces with O.5:
@@ -221,7 +198,7 @@ minmax <- function(data, ...) {
   return(res)
 }
 
-# R?sum? statistique sur n'importe quel tableau avec au moins une colonne (et avec l'option na.rm=T)
+# Resume statistique sur n'importe quel data.Frame avec au moins une colonne (et avec l'option na.rm=T)
 sumstats=function(x) {
   mean.k=function(x) {if (is.numeric(x)) round(mean.(x), digits = 2)
     else "N*N"}
@@ -240,8 +217,8 @@ sumstats=function(x) {
   return(sumtable)
 }
 
-# fonction pour v?rifier si deux nombres sont quasiument ?gaux (apr?s bcp de d?cimales)
-# typiquement pour v?rifier l'?galit? entre un nombre et le meme mais apr?s conversion depuis du texte (perte des derni?res d?cimales)
+# fonction pour verifier si deux nombres sont quasiument egaux (a la precision machine pres)
+# typiquement pour verifier l'egalite entre un nombre et le meme nombre issu d'un format charactere
 almost.equal <- function (x, y, tolerance=.Machine$double.eps^0.5,
                           na.value=TRUE)
 {
@@ -251,27 +228,35 @@ almost.equal <- function (x, y, tolerance=.Machine$double.eps^0.5,
   answer
 }
 
-# Fonction pour enlever les colonnes avec trop de zeros parmi les num?riques. Proportion limite: entre z?ro et un.
+# Fonction qui donne les noms des mois en francais ou anglais (sans)
+MonthNames = function(langue=1){
+  switch(langue, 
+         c("janvier", "fevrier", "mars", "avril", "mai", "juin", "juillet", "aout", "septembre", "octobre", "novembre", "decembre"),
+         c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+}
+
+# Fonction pour enlever les colonnes avec trop de zeros parmi les numeriques. 
+# Proportion limite: entre zero et un.
 RemoveZeros = function(data, proportion=0.00){
   temp <- data
   NullRatio = function(x) {length(x[x==0])/length(x)}
   to_keep <- which(apply(temp, 2, NullRatio) <= proportion)
-  message("colonnes supprim?es: ", paste0(names(temp)[-to_keep], collapse=", "))
+  message("colonnes supprimees: ", paste0(names(temp)[-to_keep], collapse=", "))
   return(temp[, to_keep])
 }
 
-# Fonction pour enlever les colonnes avec trop de NAs parmi les num?riques. Proportion limite: entre z?ro et un.
+# Fonction pour enlever les colonnes avec trop de NAs parmi les numeriques. 
+# Proportion limite: entre zero et un.
 RemoveNAs = function(data, proportion=1.00){
   temp <- data
   to_keep <- which(apply(temp, 2, function(x) sum(!complete.cases(x))/NROW(x)) <= proportion)
-  message("colonnes supprim?es: ", paste0(names(temp)[-to_keep], collapse=", "))
+  message("colonnes supprimees: ", paste0(names(temp)[-to_keep], collapse=", "))
   return(temp[, to_keep])
 }
 
-
-# Fonction qui cr?e un vecteur d'appartenance ? un groupe, ? partir de la position
-# des limites de groupes (extr?mit?s comprises). ON peut pr?ciser des noms de niveaux.
-CreateRunGroups = function(limits, factor=F, ...) { #warning: the limits must have 0 first, and length(X) as last
+# Fonction qui cree un vecteur d'appartenance a un groupe, a partir de la position
+# des limites de groupes (extremites comprises). ON peut preciser des noms de niveaux.
+CreateRunGroups = function(limits, factor=F, ...) { # warning: the limits must have 0 first, and length(X) as last
   breaks <- diff(limits)
   RunGroup <- unlist(sapply(c(1:length(breaks)), function(i){
     rep(i,breaks[i])
@@ -281,14 +266,14 @@ CreateRunGroups = function(limits, factor=F, ...) { #warning: the limits must ha
 }
 
 # fonction qui formatte les nombres pour X chiffres significatifs
-# Formatter les nombres à X chiffres significatifs, par défaut 3, en point ou virgule
+# Formatter les nombres à X chiffres significatifs, par defaut 3, en point ou virgule
 sign3 = function(vector, chiffres=3, virgule=FALSE) {
   temp = formatC(signif(vector,digits=chiffres), digits=chiffres, format="fg")
   if (virgule) {temp <- gsub("\\.", ",", temp) }
   return(temp)  
 }
 
-# pourcentage de nulls dans une colonne
+# pourcentage de valeurs nulles dans une colonne
 NullRatio = function(x) {
   length(na.omit(x)[na.omit(x)==0])/length(x)
   }
@@ -299,6 +284,7 @@ NullRatio. = function(x) sapply(x, NullRatio)
 
 # quick plot de points et une droite avec IC
 q_lm = function(data, y, x, ...) { # pas de guillemets
+  require(ggplot2)
   X <- deparse(substitute(x))
   Y <- deparse(substitute(y))
   fit <- lm(data[[Y]] ~ data[[X]])
@@ -309,14 +295,15 @@ q_lm = function(data, y, x, ...) { # pas de guillemets
   return(g)
 }
 
-# emuler les couleurs ggplot
+# emuler les couleurs ggplot, renvoie un vecteur de N couleurs
 gg_color_hue = function(n) {
   hues = seq(15, 375, length = n + 1)
   hcl(h = hues, l = 65, c = 100)[1:n]
 }
 
-# Cr?ation de graphiques camembert (a partir d'un tableau de contingence)
+# Creation de graphiques camembert (a partir d'un tableau de contingence)
 ggpie = function (dat, by, totals, legend="ma variable", title="graphique camembert", palette=3) {
+  require(ggplot2)
   g <<- ggplot(dat, aes_string(x=factor(1), y=totals, fill=by)) +
     geom_bar(stat='identity', color='black') +
     guides(fill=guide_legend(override.aes=list(colour=NA))) + # removes black borders from legend
@@ -331,8 +318,9 @@ ggpie = function (dat, by, totals, legend="ma variable", title="graphique camemb
   print(g)
 }
 
-# Cr?ation de graphiques camembert (a partir d'un tableau de donn?es ? deux colonnes)
+# Creation de graphiques camembert (a partir d'un tableau de donnees a deux colonnes)
 .ggpie = function(data, variable, ...){
+  require(ggplot2)
   ggpie <- function (dat, by, totals, legend="ma variable", title="graphique camembert", palette=3) {
     g <<- ggplot(dat, aes_string(x=factor(1), y=totals, fill=by)) +
       geom_bar(stat='identity', color='black') +
@@ -353,6 +341,8 @@ ggpie = function (dat, by, totals, legend="ma variable", title="graphique camemb
 
 # Graphes ACP et PACF
 ggACF = function(x){
+  require(ggplot2)
+  require(gridExtra)
   TS <- x
   bacf    <- acf(TS, plot = FALSE)
   bacfdf <<- with(bacf, data.frame(lag, acf, n.used))
@@ -371,22 +361,26 @@ ggACF = function(x){
   grid.arrange(q1, q2, ncol=2)
 }
 
-# Plot 4x4 pour une s?rie temporelle, la s?rie doit avoir une saisonnalit? et plusieurs an?es
+# Plot 4x4 pour une serie temporelle, la serie doit avoir une saisonnalite et plusieurs annees
 TS4X4 = function(time_serie, ...){
+  require(ggplot2)
+  require(gridExtra)
   df <- time_serie
   df <- data.frame('y'=as.numeric(df), 'season'=cycle(df), 'year'=trunc(time(df)))
   df[c('moy.season', 'moy.year')] <- cbind(ave(df$y, df$season, FUN=mean), ave(df$y, df$year, FUN=mean))
   # construction des 4 plots
-  p1 <- ggplot(data=df) + geom_line(aes(x=seq_along(y), y=y)) + xlab("Time") + xlab("s?rie compl?te")
-  p2 <- ggplot(data=df, aes(x=year, y=y)) + geom_line() + facet_grid(~season) + geom_line(aes(y=moy.season)) + xlab("?volution de chaque saison avec sa moyenne")
-  p3 <- ggplot(data=df, aes(x=season, y=y)) + geom_line(aes(color=factor(year))) + theme(legend.position = "none") + xlab("?volution de chaque ann?e selon la saison")
-  p4 <- ggplot(data=df) + geom_boxplot(aes(x=factor(year), y=y)) + xlab("boxplot par ann?e")
+  p1 <- ggplot(data=df) + geom_line(aes(x=seq_along(y), y=y)) + xlab("Time") + xlab("serie complete")
+  p2 <- ggplot(data=df, aes(x=year, y=y)) + geom_line() + facet_grid(~season) + geom_line(aes(y=moy.season)) + xlab("Evolution de chaque saison avec sa moyenne")
+  p3 <- ggplot(data=df, aes(x=season, y=y)) + geom_line(aes(color=factor(year))) + theme(legend.position = "none") + xlab("Evolution de chaque annee selon la saison")
+  p4 <- ggplot(data=df) + geom_boxplot(aes(x=factor(year), y=y)) + xlab("boxplot par annee")
   grid.arrange(p1, p3, p2, p4, ...)
 }
 
-# selection de variable exhaustive, charger librairie leaps
+# selection de variable exhaustive et rendu graphique  complet
+# necessite un modele cree avec la fonction regsubsets du package leaps
 regsubset4X4=function(modele) {
   require(leaps)
+  require(dplyr)
   fit <- summary(modele)
   par(mfrow=c(2, 2))
   # graphe 1
@@ -407,12 +401,11 @@ regsubset4X4=function(modele) {
 }
 
 # programme de visualisation et comptage des NA dans un data.frame.
-# Alpha: ajuster la transparence des points s'il y en beaucoup...
+# Alpha: ajuster la transparence des points s'il y en beaucoup.
 ggNA = function(data, alpha=0.5){
   require(ggplot2)
   DF <- data
   if (!is.matrix(data)) DF <- as.matrix(DF)
-  
   to.plot <- cbind.data.frame('y'=rep(1:nrow(DF), each=ncol(DF)), 
                               'x'=as.logical(t(is.na(DF)))*rep(1:ncol(DF), nrow(DF)))
   size <- 20 / log( prod(dim(DF)) )  # size of point depend on size of table
@@ -421,17 +414,16 @@ ggNA = function(data, alpha=0.5){
     scale_y_reverse() + xlim(1,ncol(DF)) +
     ggtitle("location of NAs in the data frame") +
     xlab("columns") + ylab("lines")
-  
   pc <- round(sum(is.na(DF))/prod(dim(DF))*100, 2) # % NA
   print(paste("percentage of NA data: ", pc))
-  
   return(g)
 }
 
-# fonction pour ajouter al?atoirement des NA ? un tableau. 
-# 'quantite' est soit le nombre de cases NA ou la proportion souhait?e
-# si la proportion est ?lev?e il y en aura moins car on retombe sur des NA d?j? cr??s
+# fonction pour ajouter aleatoirement des NA a un tableau. 
+# 'quantite' est soit le nombre de cases NA ou la proportion souhaitee
+# si la proportion est elevee il y en aura moins car on retombe sur des NA deja crees
 ggNAadd = function(data, quantite, plot=T){
+  require(ggplot2)
   temp <- data
   quantite2 <- ifelse(quantite<1, round(prod(dim(data))*quantite), quantite)
   if (quantite2 >= prod(dim(data))) stop("trop de NA")
@@ -440,8 +432,11 @@ ggNAadd = function(data, quantite, plot=T){
   return(temp)
 }  
 
-# Fonction pour repr?senter graphiquement la structure d'un tableau ou vecteur.
+# Fonction pour representer graphiquement la structure d'un tableau ou vecteur.
 colstr = function(input, size.max=500, export=FALSE) {
+  require(ggplot2)
+  require(RColorBrewer)
+  require(reshape2)
   data      <- as.data.frame(input)
   if (NCOL(data) == 1) {
     data    <- cbind(data, data)
@@ -453,13 +448,13 @@ colstr = function(input, size.max=500, export=FALSE) {
   numeric   <- which(sapply(data, is.numeric))
   character <- which(sapply(data, is.character))
   factor    <- which(sapply(data, is.factor))
-  # transformation des caract?res en code 
-  miror[character] <- 12 # code caract?re
+  # transformation des caracteres en code 
+  miror[character] <- 12 # code caractere
   # transformation des facteurs
-  miror[factor] <- 11 # code caract?re
-  # normalisation minmax sur les donn?es num?riques, par colonne:
+  miror[factor] <- 11 # code caractere
+  # normalisation minmax sur les donnees numeriques, par colonne:
   if (!is.empty(numeric)) {miror[numeric] <- minmax(miror[numeric], na.rm=T)}
-  miror[numeric] <- data.frame(lapply(miror[numeric], function(x) cut(x, breaks=9, labels=1:9))) # 9 classes num?riques
+  miror[numeric] <- data.frame(lapply(miror[numeric], function(x) cut(x, breaks=9, labels=1:9))) # 9 classes numeriques
   miror <- data.frame(lapply(miror, as.numeric))
   # conversion des NA
   miror[is.na(data)] <- 10
@@ -474,8 +469,8 @@ colstr = function(input, size.max=500, export=FALSE) {
   # plot
   g <- ggplot(data=melt(as.matrix(unname(miror)))) + 
     geom_tile(aes(x=Var2, y=Var1, fill=factor(value, levels=1:13))) +
-    scale_fill_manual("l?gende", values=mypalette, labels=colnames, drop=FALSE) +
-    ggtitle(paste("repr?sentation symbolique de", deparse(substitute(input)), paste(dim(input), collapse="X"), ifelse(couper, "(tronqu?)", ""))) +
+    scale_fill_manual("legende", values=mypalette, labels=colnames, drop=FALSE) +
+    ggtitle(paste("representation symbolique de", deparse(substitute(input)), paste(dim(input), collapse="X"), ifelse(couper, "(tronque)", ""))) +
     xlab("colonnes du tableau") + ylab("lignes du tableau") +
     geom_point(data=data.frame(x=0, y=1:NROW.cut), aes(x,y), alpha=1-all(row.names(miror)==seq(1, NROW.cut))) +
     scale_y_reverse()
@@ -491,6 +486,7 @@ colstr = function(input, size.max=500, export=FALSE) {
 
 # Fonction qui retourne la position du plus fort outlier (grubbs) colonne par colonne
 where.outliers = function(data){
+  require(outliers)
   where <- data.frame(x=numeric(0), y=numeric(0))
   for (i in 1:ncol(data)){
     if (is.numeric(data[[i]])) {
@@ -504,8 +500,9 @@ where.outliers = function(data){
   return(where)
 }
 
-# Fonction pour plotter un histogramme de fr?quence avec courbe de densit? ajust?e, option titre et largeur
+# Fonction pour plotter un histogramme de frequence avec courbe de densite ajustee, option titre et largeur
 HistoDens = function(x, intervalles=NULL, titre="histogramme et densite lissee") {
+  require(ggplot2)
   g <- qplot(x, geom='blank') + 
     geom_line(aes(y = ..density.., colour = 'Empirical'), stat = 'density') +  
     geom_histogram(aes(y = ..density..), alpha = 0.4, binwidth=intervalles) +                        
@@ -515,9 +512,7 @@ HistoDens = function(x, intervalles=NULL, titre="histogramme et densite lissee")
 }
 
 # La fonction 'ggPCA' permet de tracer des ACP
-# avec une variable qualitative illustrative et des ellipses de groupe
-# en utilisant ggplot2 qui est plus pratique et plus esth?tique
-# voir l'aide d?taill?e pour les arguments en entr?e
+# avec une variable qualitative illustrative et des ellipses de groupe, et en utilisant ggplot2 
 ggPCA = function(DATA, quali=0, axes=12, ncomp=5, makenames=1, title="ACP, data", col=0, plots=c(1:4)){
   require(ggplot2)
   require(FactoMineR)
@@ -529,19 +524,19 @@ ggPCA = function(DATA, quali=0, axes=12, ncomp=5, makenames=1, title="ACP, data"
     tt = seq(0, 2 * pi, length = npoints)
     xx = center[1] + r * cos(tt)
     yy = center[1] + r * sin(tt)
-    return(data.frame(x = xx, y = yy))} # n?cessaire ? la suivante
+    return(data.frame(x = xx, y = yy))} # necessaire a la suivante
   data <- droplevels(data.frame(DATA))
   if (quali==0) {data <- cbind(data, 'nofactor'=""); quali='nofactor'}
   data[quali] <- as.factor(data[,quali]) # on transforme en facteur la variable choisie
-  quali.index <- which(colnames(data)==quali)  # num?ro de la colonne quali
+  quali.index <- which(colnames(data)==quali)  # numero de la colonne quali
   nb.levels   <- length(levels(data[, quali])) #nombre de niveaux du facteur
-  # v?rification des couleurs du facteur
+  # verification des couleurs du facteur
   if (col==0) {col=colors()[round(runif(nb.levels, 24, 137))]}
   if (length(col)>nb.levels) {col=col[1:nb.levels]}
   if (length(col)<nb.levels) {col=c(col, colors()[round(runif(nb.levels-length(col), 24, 137))])}
   if (nb.levels==1) {col=colors()[99]}
-  CP1 <- as.numeric(substr(axes, 1, 1)) # N?abscisse
-  CP2 <- as.numeric(substr(axes, 2, 2)) # N? ordonn?e
+  CP1 <- as.numeric(substr(axes, 1, 1)) # abscisse
+  CP2 <- as.numeric(substr(axes, 2, 2)) # ordonnee
   data.PCA <- data[, sapply(data, is.numeric)] # tableau pour PCA avec quanti seul.
   data.PCA <<- data[, sapply(data, is.numeric)] # tableau pour PCA avec quanti seul.
   if (makenames==1) {row.names(data.PCA)=paste(seq_along(data[, quali]), data[, quali])}
@@ -587,23 +582,21 @@ ggPCA = function(DATA, quali=0, axes=12, ncomp=5, makenames=1, title="ACP, data"
   plot3 <- ggplot(data=var) + ggtitle("contribution des axes") +
     geom_bar(aes(x=comp, y=percentage.of.variance, fill=percentage.of.variance), stat="identity") +
     geom_line(data=var2, aes(x=comp, y=cumulative.percentage.of.variance), size=3, color="darkgoldenrod1") +
-    xlab("num?ro de la composante")+ylab("% variance totale") + theme(legend.title=element_blank())
+    xlab("numero de la composante")+ylab("% variance totale") + theme(legend.title=element_blank())
   plot4 <- ggdendrogram(hclust(dist(data.PCA)), rotate=T, size=4, theme_dendro=F)+ggtitle("dendrogramme")
-  #plot1 <<- plot1
   do.call("grid.arrange", c(list(plot3, plot1, plot4, plot2)[plots]))
 } 
 
 # ggCA (analyse des correspondances, 2 variables quali)
-# entrer un data.frame ou une table de contingence ? 2 dimensions
+# entrer un data.frame ou une table de contingence a 2 dimensions
 # un data.frame doit comporter au moins deux variables facteurs.
-# en cas de disjonction compl?te, on obtient une erreur.
-# axes=12 signifie qu'on repr?sente l'axe 1 et 2.
-# le r?sultat de l'AC est stock? dans la variable "res"
+# en cas de disjonction complete, on obtient une erreur.
+# axes=12 signifie qu'on represente l'axe 1 et 2.
+# le resultat de l'AC est stocke dans la variable "res"
 ggCA = function(input, axes=12) {
-  # packages
   require(FactoMineR)
   require(ggplot2)
-  # format des donn?es
+  # format des donnees
   if ( all(apply(input, 2, is.numeric)) ) {
     factors <- c("colonnes", "lignes")
     data <- input
@@ -615,8 +608,8 @@ ggCA = function(input, axes=12) {
     message("only first 2 quali variables processed")
   }
   # axes
-  CP1 <- as.numeric(substr(axes, 1, 1)) # N?abscisse
-  CP2 <- as.numeric(substr(axes, 2, 2)) # N? ordonn?e
+  CP1 <- as.numeric(substr(axes, 1, 1)) # abscisse
+  CP2 <- as.numeric(substr(axes, 2, 2)) # ordonnee
   # coeur
   res    <- CA(data, graph=FALSE)
   res   <<- res
@@ -638,23 +631,24 @@ ggCA = function(input, axes=12) {
     scale_size_continuous("effectif", range=c(1,15)) +
     scale_color_manual("type", values=c("red", "blue"), labels=factors) +
     ggtitle(label=paste("Analyse des correspondances: ", deparse(substitute(input)))) +
-    xlab(paste0("axe n?", CP1, " ? ", round(res$eig[CP1, 2]), "%")) +
-    ylab(paste0("axe n?", CP2, " ? ", round(res$eig[CP2, 2]), "%"))
+    xlab(paste0("axe no", CP1, " a ", round(res$eig[CP1, 2]), "%")) +
+    ylab(paste0("axe no", CP2, " a ", round(res$eig[CP2, 2]), "%"))
   # fin
   return(g)
 }
 
 
-# fonction plot avec m?thode pour objet de classe lm
+# fonction plot avec methode pour objet de classe lm
 lmplots = function(model){ 
   
   # packages
-  require(ggplot2); require(gridExtra)
+  require(ggplot2)
+  require(gridExtra)
   
   df <- model$model
   p <- length(model$coef)
   
-  # nouvelles variables d'analyse de la r?gression
+  # nouvelles variables d'analyse de la regression
   df['predict'] = predict(model, newdata=df)
   df['resid']   = residuals(model)
   df['rstud']   = rstudent(model)
@@ -680,13 +674,13 @@ lmplots = function(model){
     geom_hline(yintercept=0, col="black", "alpha=0.7") +
     ggtitle("residus, dans l'ordre d'apparition")
   
-  # plot histrogramme des r?sidus
+  # plot histrogramme des residus
   HistoDens = function(x, intervalles=NULL, titre="histogramme et densite lissee") {
     g <- qplot(x, geom='blank') + 
       geom_line(aes(y = ..density.., colour = 'Empirical'), stat = 'density') +  
       geom_histogram(aes(y = ..density..), alpha = 0.4, binwidth=intervalles) +                        
-      scale_colour_manual(name = 'densit?', values="red", label="lissage") +
-      xlab("intervalles de la variable") + ylab("frequence & densit?") + ggtitle(titre) + theme(legend.position = "none")
+      scale_colour_manual(name = 'densite', values="red", label="lissage") +
+      xlab("intervalles de la variable") + ylab("frequence & densite") + ggtitle(titre) + theme(legend.position = "none")
     return(g)  }
   g3 <- HistoDens(df$resid, intervalles=diff(range(df$resid/10)), titre="histogramme et densite des residus")
   
@@ -713,10 +707,11 @@ lmplots = function(model){
   return(out)
 }
 
-# la fonction lml trace la r?gression d'un mod?le lin?aire simple univari?
-# trace ?galement la droite de r?gression, les deux intervalles de confiance et pr?diction
-# ainsi que le leverage de chaque point, seuill? ? 0.06, et une courbe loess ajust?e.
+# la fonction lml trace la reression d'un modele lineaire simple univarie
+# trace egalement la droite de regression, les deux intervalles de confiance et preiction
+# ainsi que le leverage de chaque point, seuille a 0.06, et une courbe loess ajustee.
 lml = function(model, seuil=0.06, titre="plot des donnees, droite reg, et levier, int.conf&pred"){
+  require(ggplot2)
   if (length(model$coef) > 2) {stop("modele multivarie")}
   df <- model$model
   y  <- names(attributes(model$terms)$dataClasses)[1]
@@ -741,9 +736,10 @@ lml = function(model, seuil=0.06, titre="plot des donnees, droite reg, et levier
   return(list('outliers.levier'=outleviers))
 }
 
-# possibilit? d'appliquer lml ? tout un data.frame
-# il fait les r?gressions sur les variables X une par une
+# possibilite d'appliquer lml a tout un data.frame
+# il fait les regressions sur les variables X une par une
 lmlX = function(Y, X, ask=T){
+  require(ggplot2)
   par(ask=ask)
   for (i in 1:ncol(X)){
     x <- data.frame(X)[, i]
@@ -752,7 +748,7 @@ lmlX = function(Y, X, ask=T){
   par(ask=F)
 }
 
-# calcule plusieurs types d'erreur de prÃ©diction
+# calcule plusieurs types d'erreur de prediction
 PredError = function(actual, predicted, type="RMSE", season, ...){
   temp <- na.omit(data.frame(actual, predicted))
   # use the {...} to specify na.rm=TRUE or weightings of means and sums
@@ -826,10 +822,12 @@ PredError = function(actual, predicted, type="RMSE", season, ...){
   return(output)
 }
 
-# fonction qui ajoute Ã  un tableau des colonnes de variables calendaires pratiques pour la modÃ©lisation
-# temporelle. Detailed FALSE donne les formats pratiques par dÃ©faut, numÃ©rique ou facteur selon le cas,
+# fonction qui ajoute a un tableau des colonnes de variables calendaires pratiques pour la modelisation
+# temporelle. Detailed FALSE donne les formats pratiques par defaut, numerique ou facteur selon le cas,
 # detailed TRUE donne l'un et l'autre.
 CreateCalendarVariables = function(df, id_column=NULL, detailed=FALSE) {
+  require(lubridate)
+  require(dplyr)
   if (  !("data.frame" %in% class(df))  ){
     message("la donnee en entree a ete convertie en data.frame")
     df <- data.frame(df)
@@ -839,7 +837,6 @@ CreateCalendarVariables = function(df, id_column=NULL, detailed=FALSE) {
   if (  !(class(temp)[1] %in% c("Date", "POSIXct", "POSIXt", "POSIXlt"))  ){
     stop("la colonne de dates n'est pas de classe appropriee")
   }
-  require(lubridate)
   df['.annee']      <- year(temp)
   df['.trimestre']  <- quarter(temp)
   df['.mois']       <- month(temp)
@@ -866,10 +863,10 @@ CreateCalendarVariables = function(df, id_column=NULL, detailed=FALSE) {
   }
   return(df)
 }
-##" plus ajouter Ã  la fonction la possibilitÃ© de remplir les dates vides par NA?
+# A faire: ajouter la fonction la possibilite de remplir les dates vides par NA?
 
 
 ############################################
 #              FIN
 
-# message("liste des fonctions charg?es:"); print(liste); rm(liste)
+message("liste des fonctions chargees:"); print(liste); rm(liste)
